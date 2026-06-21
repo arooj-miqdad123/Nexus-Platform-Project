@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <UserSecretsId>22442777-6add-4a39-8588-8b413b7b1ab1</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EF Core -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0-preview.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0-preview.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0-preview.*">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+
+    <!-- JWT -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0-preview.*" />
+
+    <!-- BCrypt -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+
+    <!-- AutoMapper -->
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+
+    <!-- Swagger -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+
+    <!-- Stripe -->
+    <PackageReference Include="Stripe.net" Version="44.12.0" />
+
+    <!-- FluentValidation -->
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\documents\" />
+    <Folder Include="wwwroot\signatures\" />
+    <Folder Include="wwwroot\profiles\" />
+  </ItemGroup>
+
+</Project>

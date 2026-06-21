@@ -1,0 +1,6 @@
+@NexusBackend_HostAddress = http://localhost:5243
+
+GET {{NexusBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
