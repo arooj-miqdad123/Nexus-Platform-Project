@@ -1,9 +1,7 @@
 // src/api.ts
+const BASE_URL: string = "http://localhost:5243"; // Local development ke liye strictly http
 
-const BASE_URL: string = "httph://localhost:5243"; // local ke liye
-// Deploy hone ke baad: const BASE_URL = "https://localhost:5243";
-
-// Token localStorage se lena (Return type string ya null ho sakti hai)
+// Token localStorage se lena
 const getToken = (): string | null => localStorage.getItem("nexus_token");
 
 // Helper function ke liye interfaces
@@ -13,8 +11,12 @@ interface ApiOptions {
     body?: string;
 }
 
-// Helper function — har API call ke liye
-const apiCall = async (endpoint: string, method: string = "GET", body: any = null): Promise<any> => {
+// Generic Helper function — any hata kar unknown/T use kiya ha
+const apiCall = async <T = unknown>(
+    endpoint: string,
+    method: string = "GET",
+    body: unknown = null
+): Promise<T> => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     const token = getToken();
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -26,37 +28,38 @@ const apiCall = async (endpoint: string, method: string = "GET", body: any = nul
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.message || "Something went wrong");
-    return data;
+    return data as T;
 };
 
 // ===== AUTH =====
-export const registerUser = (fullName: string, email: string, password: string, role: string): Promise<any> =>
+// NOTE: Agar backend par signup ha tou niche "/api/auth/register" ko badal kar "/api/auth/signup" kar dein.
+export const registerUser = (fullName: string, email: string, password: string, role: string): Promise<unknown> =>
     apiCall("/api/auth/register", "POST", { fullName, email, password, role });
 
-export const loginUser = (email: string, password: string): Promise<any> =>
+export const loginUser = (email: string, password: string): Promise<unknown> =>
     apiCall("/api/auth/login", "POST", { email, password });
 
-export const getMyProfile = (): Promise<any> =>
+export const getMyProfile = (): Promise<unknown> =>
     apiCall("/api/auth/profile");
 
-export const updateProfile = (data: any): Promise<any> =>
+export const updateProfile = (data: Record<string, unknown>): Promise<unknown> =>
     apiCall("/api/auth/profile", "PUT", data);
 
 // ===== MEETINGS =====
-export const scheduleMeeting = (data: any): Promise<any> =>
+export const scheduleMeeting = (data: Record<string, unknown>): Promise<unknown> =>
     apiCall("/api/meeting", "POST", data);
 
-export const getMyMeetings = (): Promise<any> =>
+export const getMyMeetings = (): Promise<unknown> =>
     apiCall("/api/meeting");
 
-export const updateMeetingStatus = (id: string | number, status: string): Promise<any> =>
+export const updateMeetingStatus = (id: string | number, status: string): Promise<unknown> =>
     apiCall(`/api/meeting/${id}/status`, "PUT", { status });
 
 // ===== DOCUMENTS =====
-export const getMyDocuments = (): Promise<any> =>
+export const getMyDocuments = (): Promise<unknown> =>
     apiCall("/api/document");
 
-export const uploadDocument = async (file: File, title: string, description: string = ""): Promise<any> => {
+export const uploadDocument = async (file: File, title: string, description: string = ""): Promise<unknown> => {
     const token = getToken();
     const formData = new FormData();
     formData.append("file", file);
@@ -68,7 +71,7 @@ export const uploadDocument = async (file: File, title: string, description: str
 
     const res = await fetch(`${BASE_URL}/api/document/upload`, {
         method: "POST",
-        headers: headers, // Fetch FormData ke sath Content-Type khud set karta hai
+        headers: headers,
         body: formData,
     });
 
@@ -77,7 +80,7 @@ export const uploadDocument = async (file: File, title: string, description: str
     return data;
 };
 
-export const signDocument = async (docId: string | number, signatureImageFile: File): Promise<any> => {
+export const signDocument = async (docId: string | number, signatureImageFile: File): Promise<unknown> => {
     const token = getToken();
     const formData = new FormData();
     formData.append("signatureImage", signatureImageFile);
@@ -94,11 +97,11 @@ export const signDocument = async (docId: string | number, signatureImageFile: F
 };
 
 // ===== PAYMENTS =====
-export const createPayment = (amount: number, currency: string = "usd", description: string = ""): Promise<any> =>
+export const createPayment = (amount: number, currency: string = "usd", description: string = ""): Promise<unknown> =>
     apiCall("/api/payment/create", "POST", { amount, currency, description });
 
-export const confirmPayment = (transactionId: string | number): Promise<any> =>
+export const confirmPayment = (transactionId: string | number): Promise<unknown> =>
     apiCall(`/api/payment/confirm/${transactionId}`, "POST");
 
-export const getTransactions = (): Promise<any> =>
+export const getTransactions = (): Promise<unknown> =>
     apiCall("/api/payment/transactions");

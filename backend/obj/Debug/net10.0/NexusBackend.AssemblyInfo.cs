@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NexusBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd5061210b1b6c7ab53fef416e52c1abed3d94e8")]
 [assembly: System.Reflection.AssemblyProductAttribute("NexusBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NexusBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

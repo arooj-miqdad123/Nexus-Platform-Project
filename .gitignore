@@ -1,0 +1,16 @@
+# Visual Studio & .NET temporary files
+.vs/
+bin/
+obj/
+*.user
+*.suo
+
+# Node / Frontend dependencies & builds
+node_modules/
+dist/
+build/
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
