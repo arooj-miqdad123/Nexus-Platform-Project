@@ -96,14 +96,14 @@ function App() {
           {/* Redirect root to login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           
-          {/* Catch all other routes and redirect to login */}
+          
+                  <Route path="/video-call" element={<DashboardLayout />}>
+                      <Route index element={<VideoCallPage />} />
+                  </Route>
+                  {/* Catch all other routes and redirect to login */}
                   <Route path="*" element={<Navigate to="/login" replace />} />
                   <Route path="/meetings" element={<DashboardLayout />}>
                       <Route index element={<MeetingsPage />} />
-                  </Route>
-
-                  <Route path="/video-call" element={<DashboardLayout />}>
-                      <Route index element={<VideoCallPage />} />
                   </Route>
         </Routes>
       </Router>

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import type { HubConnection } from '@microsoft/signalr'; // <-- SignalR ki type import ki hai
 
 // Backend URL
-const BACKEND_URL = 'https://localhost:5243';
+const BACKEND_URL = 'http://localhost:5243';
 
 export const VideoCallPage: React.FC = () => {
     const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -30,7 +30,7 @@ export const VideoCallPage: React.FC = () => {
     };
 
     const joinRoom = async () => {
-        if (!roomInput.trim()) return toast.error('Room ID daalo');
+        if (!roomInput.trim()) return toast.error('Enter Room ID ');
         const id = roomInput.trim();
         setRoomId(id);
 
@@ -94,10 +94,10 @@ export const VideoCallPage: React.FC = () => {
             await connection.start();
             await connection.invoke('JoinRoom', id, 'User');
             setIsInCall(true);
-            toast.success(`Room ${id} join ho gaya!`);
+            toast.success(`Room ${id} joined!`);
         } catch (err) {
             console.error(err);
-            toast.error('Connection failed. Backend chal raha hai?');
+            toast.error('Connection failed. IS Backend Running?');
         }
     };
 
@@ -133,11 +133,11 @@ export const VideoCallPage: React.FC = () => {
             {!isInCall ? (
                 <div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow">
                     <Video className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                    <h2 className="text-xl font-semibold mb-4">Room join karo ya banao</h2>
+                    <h2 className="text-xl font-semibold mb-4">Join or Create a room</h2>
                     <div className="flex gap-3 max-w-md mx-auto">
                         <input
                             className="flex-1 border rounded-lg px-4 py-2 bg-white dark:bg-gray-700"
-                            placeholder="Room ID likhao..."
+                            placeholder="Write Room Id"
                             value={roomInput}
                             onChange={e => setRoomInput(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && joinRoom()}
@@ -145,7 +145,7 @@ export const VideoCallPage: React.FC = () => {
                         <Button onClick={joinRoom}>Join</Button>
                     </div>
                     <p className="text-sm text-gray-400 mt-3">
-                        Dono log same Room ID use karein
+                        Both users must use the same Room ID
                     </p>
                 </div>
             ) : (

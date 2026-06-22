@@ -7,6 +7,26 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { UserRole } from '../../types';
 
+// ✅ Defined a robust interface for the Backend Login API Response
+interface LoginUserResponse {
+    token?: string;
+    user?: {
+        id?: number | string;
+        email?: string;
+        role?: string;
+        [key: string]: unknown;
+    };
+    data?: {
+        token?: string;
+        user?: {
+            id?: number | string;
+            email?: string;
+            role?: string;
+            [key: string]: unknown;
+        };
+    };
+}
+
 export const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -23,8 +43,8 @@ export const LoginPage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            // 1. Apne backend API (loginUser) ko call kiya
-            const res = await loginUser(email, password);
+            // 1. Backend API response typed safely to remove compiler and ESLint errors
+            const res = await loginUser(email, password) as LoginUserResponse;
 
             // 2. Token aur User details ko safely browser ke localStorage mein save kiya
             if (res && res.token) {
@@ -107,8 +127,8 @@ export const LoginPage: React.FC = () => {
                                 <button
                                     type="button"
                                     className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'entrepreneur'
-                                            ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                                         }`}
                                     onClick={() => setRole('entrepreneur')}
                                 >
@@ -119,8 +139,8 @@ export const LoginPage: React.FC = () => {
                                 <button
                                     type="button"
                                     className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'investor'
-                                            ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                                         }`}
                                     onClick={() => setRole('investor')}
                                 >

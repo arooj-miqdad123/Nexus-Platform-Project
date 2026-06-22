@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Upload, Download, Trash2, Share2 } from 'lucide-react';
+import { FileText, Upload, Download, Trash2, Share2, Eye } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { getMyDocuments, uploadDocument } from '../../api';
 
-// ✅ Added strict explicit type structure to eliminate 'any' error completely
 interface DocumentItem {
     id?: number | string;
     _id?: number | string;
@@ -18,8 +17,12 @@ interface DocumentItem {
     lastModified?: string;
 }
 
+interface GetDocumentsResponse {
+    data?: DocumentItem[];
+    [key: string]: unknown;
+}
+
 export const DocumentsPage: React.FC = () => {
-    // ✅ Replaced 'any[]' with 'DocumentItem[]' to satisfy ESLint
     const [documents, setDocuments] = useState<DocumentItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isUploading, setIsUploading] = useState(false);
@@ -27,8 +30,15 @@ export const DocumentsPage: React.FC = () => {
 
     const fetchDocs = async () => {
         try {
-            const res = await getMyDocuments();
-            setDocuments(res.data || res || []);
+            const res = await getMyDocuments() as GetDocumentsResponse;
+
+            if (res && Array.isArray(res.data)) {
+                setDocuments(res.data);
+            } else if (Array.isArray(res)) {
+                setDocuments(res as DocumentItem[]);
+            } else {
+                setDocuments([]);
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -103,18 +113,10 @@ export const DocumentsPage: React.FC = () => {
                         <div className="pt-4 border-t border-gray-200">
                             <h3 className="text-sm font-medium text-gray-900 mb-2">Quick Access</h3>
                             <div className="space-y-2">
-                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
-                                    Recent Files
-                                </button>
-                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
-                                    Shared with Me
-                                </button>
-                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
-                                    Starred
-                                </button>
-                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
-                                    Trash
-                                </button>
+                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">Recent Files</button>
+                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">Shared with Me</button>
+                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">Starred</button>
+                                <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">Trash</button>
                             </div>
                         </div>
                     </CardBody>
@@ -126,12 +128,8 @@ export const DocumentsPage: React.FC = () => {
                         <CardHeader className="flex justify-between items-center">
                             <h2 className="text-lg font-medium text-gray-900">All Documents</h2>
                             <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                    Sort by
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                    Filter
-                                </Button>
+                                <Button variant="outline" size="sm">Sort by</Button>
+                                <Button variant="outline" size="sm">Filter</Button>
                             </div>
                         </CardHeader>
                         <CardBody>
@@ -155,9 +153,7 @@ export const DocumentsPage: React.FC = () => {
                                                     <h3 className="text-sm font-medium text-gray-900 truncate">
                                                         {doc.title || doc.fileName || doc.name}
                                                     </h3>
-                                                    {doc.shared && (
-                                                        <Badge size="sm">Shared</Badge>
-                                                    )}
+                                                    {doc.shared && <Badge size="sm">Shared</Badge>}
                                                 </div>
 
                                                 <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
@@ -167,22 +163,37 @@ export const DocumentsPage: React.FC = () => {
                                                 </div>
                                             </div>
 
+                                            {/* Action Buttons Section */}
                                             <div className="flex items-center gap-2 ml-4">
+
+                                                {/* ✅ FIXED: Click karne par yeh seedha New Tab (`_blank`) mein file open karega */}
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     className="p-2"
-                                                    aria-label="Download"
+                                                    aria-label="View"
+                                                    onClick={() => {
+                                                        const docId = doc.id || doc._id;
+                                                        window.open(`http://localhost:5243/api/document/${docId}/download`, '_blank');
+                                                    }}
                                                 >
-                                                    <Download size={18} />
+                                                    <Eye size={18} />
                                                 </Button>
 
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     className="p-2"
-                                                    aria-label="Share"
+                                                    aria-label="Download"
+                                                    onClick={() => {
+                                                        const docId = doc.id || doc._id;
+                                                        window.open(`http://localhost:5243/api/document/${docId}/download`, '_blank');
+                                                    }}
                                                 >
+                                                    <Download size={18} />
+                                                </Button>
+
+                                                <Button variant="ghost" size="sm" className="p-2" aria-label="Share">
                                                     <Share2 size={18} />
                                                 </Button>
 

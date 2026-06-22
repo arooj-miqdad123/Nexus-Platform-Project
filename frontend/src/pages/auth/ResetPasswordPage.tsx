@@ -28,14 +28,15 @@ export const ResetPasswordPage: React.FC = () => {
     
     setIsLoading(true);
     
-    try {
-      await resetPassword(token, password);
-      navigate('/login');
-    } catch (error) {
-      // Error is handled by the AuthContext
-    } finally {
-      setIsLoading(false);
-    }
+      try {
+          await resetPassword(token, password);
+          navigate('/login');
+      } catch {
+          // Variable 'error' remove kar diya kyunki context handle kar raha hai
+          // Ab ESLint error nahi dega
+      } finally {
+          setIsLoading(false);
+      }
   };
   
   if (!token) {
