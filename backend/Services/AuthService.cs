@@ -52,16 +52,13 @@ namespace NexusBackend.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 throw new Exception("Invalid email or password");
 
-            // If 2FA enabled, return partial response
             if (user.Is2FAEnabled)
             {
                 var code = new Random().Next(100000, 999999).ToString();
                 user.TwoFactorCode = code;
                 user.TwoFactorCodeExpiry = DateTime.UtcNow.AddMinutes(10);
                 await _context.SaveChangesAsync();
-
-                // TODO: Send email with code using Nodemailer equivalent
-                throw new Exception($"2FA required. Code sent: {code}"); // Demo mein code return kar rahe hain
+                throw new Exception($"2FA required. Code sent: {code}");
             }
 
             var token = _jwtHelper.GenerateToken(user);
@@ -122,6 +119,41 @@ namespace NexusBackend.Services
             }
 
             return false;
+        }
+
+        // ✅ ForgotPassword — token generate karo aur RETURN karo (response mein aayega)
+        public async Task<string> ForgotPasswordAsync(ForgotPasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user == null)
+                throw new Exception("Yeh email registered nahi hai");
+
+            var resetToken = Guid.NewGuid().ToString("N"); // clean token without dashes
+            user.TwoFactorCode = resetToken;
+            user.TwoFactorCodeExpiry = DateTime.UtcNow.AddMinutes(30);
+            await _context.SaveChangesAsync();
+
+            return resetToken; // ✅ frontend ko return karo
+        }
+
+        // ✅ ResetPassword — token verify karo, password update karo
+        public async Task ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user == null)
+                throw new Exception("Invalid request");
+
+            if (user.TwoFactorCode != request.Token || user.TwoFactorCodeExpiry < DateTime.UtcNow)
+                throw new Exception("Token invalid ya expired hai");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.TwoFactorCode = null;
+            user.TwoFactorCodeExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
         }
 
         private static UserDto MapToUserDto(User user) => new()

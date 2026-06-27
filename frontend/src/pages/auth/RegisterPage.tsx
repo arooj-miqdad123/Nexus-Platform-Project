@@ -4,8 +4,8 @@ import { User, Mail, Lock, CircleDollarSign, Building2, AlertCircle } from 'luci
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { UserRole } from '../../types';
-// 1. registerUser api ko import kiya
-import { registerUser } from '../../api';
+// AuthContext ka useAuth hook import kiya
+import { useAuth } from '../../context/AuthContext';
 
 export const RegisterPage: React.FC = () => {
     const [name, setName] = useState('');
@@ -17,6 +17,8 @@ export const RegisterPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
+    // register function ko AuthContext se nikala
+    const { register } = useAuth();
 
     // 2. Modified handleSubmit Function
     const handleSubmit = async (e: React.FormEvent) => {
@@ -32,17 +34,13 @@ export const RegisterPage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            // Role ko capital karne ke liye capitalize logic (agar backend "Investor"/"Entrepreneur" accept karta hai)
+            // Role ka first letter capital karne ke liye capitalize logic
             const selectedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
-            // Aapka api call wala logic yahan fix kiya
-            const res = await registerUser(name, email, password, selectedRole);
+            // ✅ FIX: 'role' ki jagah 'selectedRole' pass kiya taaki unused variable error khatam ho jaye
+            await register(name, email, password, selectedRole as UserRole);
 
-            // Token aur User details ko local storage mein save karna
-            localStorage.setItem("nexus_token", res.data.token);
-            localStorage.setItem("nexus_user", JSON.stringify(res.data.user));
-
-            // Role ke hisab se dashboard par redirect karna (Aapke UI design ke mutabiq)
+            // Role ke hisab se dashboard par redirect karna
             if (role === 'entrepreneur') {
                 navigate('/dashboard/entrepreneur');
             } else {
@@ -93,8 +91,8 @@ export const RegisterPage: React.FC = () => {
                                 <button
                                     type="button"
                                     className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'entrepreneur'
-                                            ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                                         }`}
                                     onClick={() => setRole('entrepreneur')}
                                 >
@@ -105,8 +103,8 @@ export const RegisterPage: React.FC = () => {
                                 <button
                                     type="button"
                                     className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'investor'
-                                            ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                                         }`}
                                     onClick={() => setRole('investor')}
                                 >

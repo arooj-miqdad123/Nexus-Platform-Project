@@ -52,7 +52,6 @@ namespace NexusBackend.Controllers
         {
             var result = await _authService.Verify2FAAsync(request);
             if (!result) return BadRequest(new { success = false, message = "Invalid code" });
-
             return Ok(new { success = true, message = "2FA verified" });
         }
 
@@ -81,6 +80,37 @@ namespace NexusBackend.Controllers
             var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
             var result = await _authService.Enable2FAAsync(userId);
             return Ok(new { success = result, message = result ? "2FA enabled" : "Failed" });
+        }
+
+        // ✅ Forgot Password — token generate karke RESPONSE mein return karo
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            try
+            {
+                var resetToken = await _authService.ForgotPasswordAsync(request);
+                // ✅ token seedha response mein bhejo — frontend screen pe dikhayega
+                return Ok(new { success = true, resetToken = resetToken });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        // ✅ Reset Password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            try
+            {
+                await _authService.ResetPasswordAsync(request);
+                return Ok(new { success = true, message = "Password successfully update ho gaya!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
     }
 }

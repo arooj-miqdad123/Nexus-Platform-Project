@@ -11,5 +11,7 @@ namespace NexusBackend.Services
         Task<UserDto?> UpdateProfileAsync(int userId, UpdateProfileRequest request);
         Task<bool> Enable2FAAsync(int userId);
         Task<bool> Verify2FAAsync(TwoFactorRequest request);
+        Task<string> ForgotPasswordAsync(ForgotPasswordRequest request); // ✅ string return karta hai
+        Task ResetPasswordAsync(ResetPasswordRequest request);
     }
 }
