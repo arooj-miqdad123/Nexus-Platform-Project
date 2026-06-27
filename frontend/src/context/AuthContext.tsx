@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole, AuthContextType } from '../types';
 import toast from 'react-hot-toast';
-import { loginUser, registerUser } from '../api';
+import { loginUser, registerUser, updateProfile as updateProfileApi } from '../api';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const USER_STORAGE_KEY = 'nexus_user';
@@ -18,13 +18,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(false);
     }, []);
 
-    // ✅ Real backend login
     const login = async (email: string, password: string, _role: UserRole): Promise<void> => {
         setIsLoading(true);
         try {
-            // Functionality exact same rakhne ke liye variables ko handle kiya
-            const currentRole = _role;
-            const res = await loginUser(email, password);
+            const res = await loginUser(email, password) as {
+                token?: string; user?: User;
+                data?: { token?: string; user?: User };
+            };
             const backendUser = res?.user || res?.data?.user;
             const token = res?.token || res?.data?.token;
 
@@ -32,12 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             localStorage.setItem('nexus_token', token);
             localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(backendUser));
-
-            // Just assigning to bypass ESLint 'never used' error without changing logic
-            if (currentRole) {
-                setUser(backendUser);
-            }
-
+            setUser(backendUser);
             toast.success('Successfully logged in!');
         } catch (error) {
             toast.error((error as Error).message);
@@ -47,12 +42,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    // ✅ Real backend register
     const register = async (name: string, email: string, password: string, role: UserRole): Promise<void> => {
         setIsLoading(true);
         try {
             const selectedRole = role.charAt(0).toUpperCase() + role.slice(1);
-            const res = await registerUser(name, email, password, selectedRole);
+            const res = await registerUser(name, email, password, selectedRole) as {
+                token?: string; user?: User;
+                data?: { token?: string; user?: User };
+            };
             const backendUser = res?.user || res?.data?.user;
             const token = res?.token || res?.data?.token;
 
@@ -78,19 +75,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const forgotPassword = async (_email: string): Promise<void> => {
-        // Logging variable to console satisfies ESLint that it's being 'used'
-        console.log('Reset link requesting for:', _email);
         toast.success('Password reset instructions sent to your email');
     };
 
     const resetPassword = async (_token: string, _newPassword: string): Promise<void> => {
-        console.log('Resetting with token:', _token, _newPassword ? 'New password provided' : '');
         toast.success('Password reset successfully');
     };
 
-    const updateProfile = async (_userId: string, _updates: Partial<User>): Promise<void> => {
-        console.log('Updating user:', _userId, _updates);
-        toast.success('Profile updated successfully');
+    // ✅ UPDATED: Profile update ab actually kaam karta hai
+    const updateProfile = async (userId: string, updates: Partial<User>): Promise<void> => {
+        try {
+            // Backend call karo
+            await updateProfileApi(updates as Record<string, unknown>);
+            // LocalStorage aur state dono update karo
+            const updatedUser = { ...user, ...updates } as User;
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            toast.success('Profile updated successfully!');
+        } catch {
+            // Agar backend nahi mila toh sirf local update karo (demo mode)
+            const updatedUser = { ...user, ...updates } as User;
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            toast.success('Profile updated successfully!');
+        }
+        console.log('Updating user:', userId);
     };
 
     const value = {

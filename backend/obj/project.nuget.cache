@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VlWLEU2lh8A=",
+  "dgSpecHash": "Yomzegd1Ixk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\SB\\OneDrive\\Desktop\\Nexus-Project\\backend\\NexusBackend.csproj",
+  "projectFilePath": "C:\\Users\\SB\\Downloads\\nexus-updated\\nexus-updated\\backend\\NexusBackend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\SB\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\SB\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
@@ -79,9 +79,9 @@
       "code": "NU1608",
       "level": "Warning",
       "message": "Detected package version outside of dependency constraint: AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1 requires AutoMapper (= 12.0.1) but version AutoMapper 13.0.1 was resolved.",
-      "projectPath": "C:\\Users\\SB\\OneDrive\\Desktop\\Nexus-Project\\backend\\NexusBackend.csproj",
+      "projectPath": "C:\\Users\\SB\\Downloads\\nexus-updated\\nexus-updated\\backend\\NexusBackend.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\SB\\OneDrive\\Desktop\\Nexus-Project\\backend\\NexusBackend.csproj",
+      "filePath": "C:\\Users\\SB\\Downloads\\nexus-updated\\nexus-updated\\backend\\NexusBackend.csproj",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net10.0"
@@ -91,9 +91,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'AutoMapper' 13.0.1 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x",
-      "projectPath": "C:\\Users\\SB\\OneDrive\\Desktop\\Nexus-Project\\backend\\NexusBackend.csproj",
+      "projectPath": "C:\\Users\\SB\\Downloads\\nexus-updated\\nexus-updated\\backend\\NexusBackend.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\SB\\OneDrive\\Desktop\\Nexus-Project\\backend\\NexusBackend.csproj",
+      "filePath": "C:\\Users\\SB\\Downloads\\nexus-updated\\nexus-updated\\backend\\NexusBackend.csproj",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net10.0"

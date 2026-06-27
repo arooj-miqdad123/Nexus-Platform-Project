@@ -7,24 +7,10 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { UserRole } from '../../types';
 
-// ✅ Defined a robust interface for the Backend Login API Response
 interface LoginUserResponse {
     token?: string;
-    user?: {
-        id?: number | string;
-        email?: string;
-        role?: string;
-        [key: string]: unknown;
-    };
-    data?: {
-        token?: string;
-        user?: {
-            id?: number | string;
-            email?: string;
-            role?: string;
-            [key: string]: unknown;
-        };
-    };
+    user?: { id?: number | string; email?: string; role?: string; [key: string]: unknown; };
+    data?: { token?: string; user?: { id?: number | string; email?: string; role?: string; [key: string]: unknown; }; };
 }
 
 export const LoginPage: React.FC = () => {
@@ -43,10 +29,8 @@ export const LoginPage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            // 1. Backend API response typed safely to remove compiler and ESLint errors
             const res = await loginUser(email, password) as LoginUserResponse;
 
-            // 2. Token aur User details ko safely browser ke localStorage mein save kiya
             if (res && res.token) {
                 localStorage.setItem("nexus_token", res.token);
             } else if (res?.data?.token) {
@@ -59,26 +43,27 @@ export const LoginPage: React.FC = () => {
                 localStorage.setItem("nexus_user", JSON.stringify(res.data.user));
             }
 
-            // 3. Pehle se maujood local Context ko login karwaya (frontend state maintain rakhne ke liye)
             await login(email, password, role);
 
-            // 4. Backend ke response role ya selected role ke mutabiq sahi dashboard pe redirect kiya
-            const backendRole = res?.user?.role || res?.data?.user?.role || role;
+            // ✅ LOGIN KE BAAD APNI PROFILE PAR REDIRECT
+            const backendUser = res?.user || res?.data?.user;
+            const backendRole = backendUser?.role || role;
+            const userId = backendUser?.id;
 
             if (backendRole === 'Investor' || backendRole === 'investor') {
-                navigate('/dashboard/investor');
+                // Investor apni profile par jaye
+                navigate(userId ? `/profile/investor/${userId}` : '/dashboard/investor');
             } else {
-                navigate('/dashboard/entrepreneur');
+                // Entrepreneur apni profile par jaye
+                navigate(userId ? `/profile/entrepreneur/${userId}` : '/dashboard/entrepreneur');
             }
         } catch (err) {
-            // TypeScript safety ke sath error message handling takay ESLint error na de
             const errorObject = err as Error;
             setError(errorObject.message || "Login failed. Please check your credentials.");
             setIsLoading(false);
         }
     };
 
-    // For demo purposes, pre-filled credentials
     const fillDemoCredentials = (userRole: UserRole) => {
         if (userRole === 'entrepreneur') {
             setEmail('sarah@techwave.io');
@@ -112,7 +97,7 @@ export const LoginPage: React.FC = () => {
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
                     {error && (
-                        <div className="mb-4 bg-error-50 border border-error-500 text-error-700 px-4 py-3 rounded-md flex items-start">
+                        <div className="mb-4 bg-red-50 border border-red-500 text-red-700 px-4 py-3 rounded-md flex items-start">
                             <AlertCircle size={18} className="mr-2 mt-0.5" />
                             <span>{error}</span>
                         </div>
@@ -120,81 +105,42 @@ export const LoginPage: React.FC = () => {
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                I am a
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">I am a</label>
                             <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    type="button"
-                                    className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'entrepreneur'
-                                        ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    onClick={() => setRole('entrepreneur')}
-                                >
-                                    <Building2 size={18} className="mr-2" />
-                                    Entrepreneur
+                                <button type="button"
+                                    className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'entrepreneur' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                                    onClick={() => setRole('entrepreneur')}>
+                                    <Building2 size={18} className="mr-2" /> Entrepreneur
                                 </button>
-
-                                <button
-                                    type="button"
-                                    className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'investor'
-                                        ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    onClick={() => setRole('investor')}
-                                >
-                                    <CircleDollarSign size={18} className="mr-2" />
-                                    Investor
+                                <button type="button"
+                                    className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${role === 'investor' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                                    onClick={() => setRole('investor')}>
+                                    <CircleDollarSign size={18} className="mr-2" /> Investor
                                 </button>
                             </div>
                         </div>
 
-                        <Input
-                            label="Email address"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            fullWidth
-                            startAdornment={<User size={18} />}
-                        />
+                        <Input label="Email address" type="email" value={email}
+                            onChange={(e) => setEmail(e.target.value)} required fullWidth
+                            startAdornment={<User size={18} />} />
 
-                        <Input
-                            label="Password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            fullWidth
-                        />
+                        <Input label="Password" type="password" value={password}
+                            onChange={(e) => setPassword(e.target.value)} required fullWidth />
 
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                                <input
-                                    id="remember-me"
-                                    name="remember-me"
-                                    type="checkbox"
-                                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                    Remember me
-                                </label>
+                                <input id="remember-me" name="remember-me" type="checkbox"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">Remember me</label>
                             </div>
-
                             <div className="text-sm">
-                                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+                                <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                                     Forgot your password?
-                                </a>
+                                </Link>
                             </div>
                         </div>
 
-                        <Button
-                            type="submit"
-                            fullWidth
-                            isLoading={isLoading}
-                            leftIcon={<LogIn size={18} />}
-                        >
+                        <Button type="submit" fullWidth isLoading={isLoading} leftIcon={<LogIn size={18} />}>
                             Sign in
                         </Button>
                     </form>
@@ -210,42 +156,20 @@ export const LoginPage: React.FC = () => {
                         </div>
 
                         <div className="mt-4 grid grid-cols-2 gap-3">
-                            <Button
-                                variant="outline"
-                                onClick={() => fillDemoCredentials('entrepreneur')}
-                                leftIcon={<Building2 size={16} />}
-                            >
+                            <Button variant="outline" onClick={() => fillDemoCredentials('entrepreneur')} leftIcon={<Building2 size={16} />}>
                                 Entrepreneur Demo
                             </Button>
-
-                            <Button
-                                variant="outline"
-                                onClick={() => fillDemoCredentials('investor')}
-                                leftIcon={<CircleDollarSign size={16} />}
-                            >
+                            <Button variant="outline" onClick={() => fillDemoCredentials('investor')} leftIcon={<CircleDollarSign size={16} />}>
                                 Investor Demo
                             </Button>
                         </div>
                     </div>
 
-                    <div className="mt-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">Or</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-2 text-center">
-                            <p className="text-sm text-gray-600">
-                                Don't have an account?{' '}
-                                <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-                                    Sign up
-                                </Link>
-                            </p>
-                        </div>
+                    <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-600">
+                            Don't have an account?{' '}
+                            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">Sign up</Link>
+                        </p>
                     </div>
                 </div>
             </div>

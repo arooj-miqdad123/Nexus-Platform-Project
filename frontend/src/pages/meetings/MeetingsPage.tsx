@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Check, X } from 'lucide-react'; // ✅ Calendar kept intact
+import { Calendar, Plus, Check, X } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../../components/ui/Button'; // Baqi jagah ke liye rehne dein
 import { Badge } from '../../components/ui/Badge';
 import { getMyMeetings, scheduleMeeting, updateMeetingStatus } from '../../api';
 import toast from 'react-hot-toast';
@@ -103,7 +103,6 @@ export const MeetingsPage: React.FC = () => {
             fetchMeetings();
 
         } catch (err: unknown) {
-            // ✅ Fixed: Handled 'any' type error safely
             const error = err as { response?: { data?: { message?: string } }; message?: string };
             console.log("❌ API ERROR:", error?.response?.data || error?.message);
             toast.error(error?.response?.data?.message || 'Schedule failed');
@@ -117,8 +116,6 @@ export const MeetingsPage: React.FC = () => {
             fetchMeetings();
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } }; message?: string };
-
-            // ✅ End mein || 'Status update failed' lagane se undefined ka khatra khatam ho jayega
             toast.error(error?.response?.data?.message || error?.message || 'Status update failed');
         }
     };
@@ -132,7 +129,6 @@ export const MeetingsPage: React.FC = () => {
     return (
         <div className="p-6 max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-6">
-                {/* ✅ Calendar Icon used here to fix ESLint error */}
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     <Calendar className="w-6 h-6 text-gray-500" />
                     Meetings
@@ -195,14 +191,21 @@ export const MeetingsPage: React.FC = () => {
                             </div>
 
                             <div className="flex gap-2">
-                                <Button type="submit">Schedule</Button>
-                                <Button
+                                {/* ✅ Custom Button hata kar standard native HTML buttons laga diye hain */}
+                                <button
+                                    type="submit"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+                                >
+                                    Schedule
+                                </button>
+
+                                <button
                                     type="button"
-                                    variant="secondary"
+                                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg transition-colors dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                                     onClick={() => setShowForm(false)}
                                 >
                                     Cancel
-                                </Button>
+                                </button>
                             </div>
                         </form>
                     </CardBody>
