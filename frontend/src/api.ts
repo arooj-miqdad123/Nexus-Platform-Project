@@ -1,5 +1,7 @@
 // src/api.ts
-const BASE_URL: string = "http://localhost:5243"; // Local development ke liye strictly http
+
+// ✅ FIX: Pehle `.env` ka link dhoondega (Vercel/Render ke liye), nahi mila toh local chalayega
+const BASE_URL: string = import.meta.env.VITE_API_URL || "http://localhost:5243";
 
 // Token localStorage se lena
 const getToken = (): string | null => localStorage.getItem("nexus_token");
@@ -32,7 +34,6 @@ const apiCall = async <T = unknown>(
 };
 
 // ===== AUTH =====
-// NOTE: Agar backend par signup ha tou niche "/api/auth/register" ko badal kar "/api/auth/signup" kar dein.
 export const registerUser = (fullName: string, email: string, password: string, role: string): Promise<unknown> =>
     apiCall("/api/auth/register", "POST", { fullName, email, password, role });
 

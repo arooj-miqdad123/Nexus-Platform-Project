@@ -5,7 +5,8 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import toast from 'react-hot-toast';
 
-const BASE_URL = 'http://localhost:5243';
+// ✅ Yeh line pehle `.env` ka link dhoondegi, agar nahi mila toh fallback local chalayegi
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5243';
 
 export const ResetPasswordPage: React.FC = () => {
     const [password, setPassword] = useState('');
